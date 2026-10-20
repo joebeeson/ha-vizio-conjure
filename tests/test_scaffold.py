@@ -56,4 +56,5 @@ def test_setup_registers_milestone_two_actions() -> None:
         "vizio_conjure.reload",
         "vizio_conjure.exit",
         "vizio_conjure.send_key",
+        "vizio_conjure.page_command",
     ]

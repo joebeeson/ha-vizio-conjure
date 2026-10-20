@@ -28,6 +28,7 @@ from .const import (
     PLATFORMS,
     SERVICE_EXIT,
     SERVICE_LAUNCH,
+    SERVICE_PAGE_COMMAND,
     SERVICE_RELOAD,
     SERVICE_SEND_KEY,
     SERVICE_SHOW_LOVELACE_VIEW,
@@ -58,6 +59,15 @@ EXIT_SCHEMA = vol.Schema({vol.Optional(ATTR_ENTRY_ID): cv.string})
 SEND_KEY_SCHEMA = vol.Schema(
     {
         vol.Required(ATTR_KEY): vol.In(sorted(ALLOWED_KEYS)),
+        vol.Optional(ATTR_ENTRY_ID): cv.string,
+    }
+)
+PAGE_COMMAND_SCHEMA = vol.Schema(
+    {
+        vol.Required("subject"): vol.In(
+            ["page.navigate", "page.reload", "page.focus", "session.close"]
+        ),
+        vol.Optional("payload", default={}): dict,
         vol.Optional(ATTR_ENTRY_ID): cv.string,
     }
 )
@@ -196,6 +206,16 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         except (OSError, ValueError, VizioError) as err:
             raise HomeAssistantError(str(err)) from err
 
+    async def async_page_command(call: ServiceCall) -> None:
+        _, runtime = _runtime_for_call(hass, call)
+        session_id = runtime.connection.snapshot.session_id
+        if not session_id:
+            raise HomeAssistantError("no active Conjure page session")
+        try:
+            bridge.queue_for_session(session_id, call.data["subject"], call.data["payload"])
+        except ValueError as err:
+            raise HomeAssistantError(str(err)) from err
+
     hass.services.async_register(  # pyrefly: ignore [bad-argument-type]
         DOMAIN,
         SERVICE_LAUNCH,
@@ -225,6 +245,12 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         SERVICE_SEND_KEY,
         async_send_key,
         schema=SEND_KEY_SCHEMA,  # pyrefly: ignore [bad-argument-type]
+    )
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_PAGE_COMMAND,
+        async_page_command,
+        schema=PAGE_COMMAND_SCHEMA,  # pyrefly: ignore [bad-argument-type]
     )
     return True
 

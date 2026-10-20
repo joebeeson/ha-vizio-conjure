@@ -46,6 +46,10 @@ same app 17 / namespace 4 launch mapping as `vizaio-conjure`; it uses a small
 compatibility path until the private Python library is publishable as a
 runtime dependency.
 
+Use `vizio_conjure.page_command` for the fixed page subjects (`page.navigate`,
+`page.reload`, `page.focus`, and `session.close`) while a session is active.
+Its payload is bounded JSON and cannot call arbitrary Home Assistant services.
+
 ## Named targets
 
 Open the VIZIO Conjure config-entry options and enter a JSON list such as:

@@ -98,3 +98,29 @@ send_key:
       required: false
       selector:
         text:
+
+page_command:
+  name: Send Conjure page command
+  description: Queue a constrained command for the active Conjure page session.
+  fields:
+    subject:
+      name: Subject
+      required: true
+      selector:
+        select:
+          options:
+            - page.navigate
+            - page.reload
+            - page.focus
+            - session.close
+    payload:
+      name: Payload
+      description: JSON object interpreted by the loaded page.
+      required: false
+      selector:
+        object:
+    entry_id:
+      name: Config entry ID
+      required: false
+      selector:
+        text:

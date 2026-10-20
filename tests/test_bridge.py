@@ -22,7 +22,7 @@ def test_bridge_publishes_allowlisted_events_and_commands() -> None:
     session = registry.issue("session-1", entry_id="entry-1")
 
     registry.publish(session.capability, "page.ready", {"runtime": "vizio"})
-    registry.queue(session.capability, "page.reload", {})
+    registry.queue_for_session(session.session_id, "page.reload", {})
     _, commands = registry.drain(session.capability)
 
     assert commands == [{"subject": "page.reload", "payload": {}}]

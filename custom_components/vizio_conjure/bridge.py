@@ -94,7 +94,18 @@ class BridgeRegistry:
             raise ValueError("bridge command is not allowed")
         if not isinstance(payload, dict):
             raise ValueError("bridge payload must be an object")
+        if len(repr(payload)) > 16_384:
+            raise ValueError("bridge payload is too large")
         session.commands.append({"subject": subject, "payload": payload})
+
+    def queue_for_session(self, session_id: str, subject: str, payload: object) -> None:
+        """Queue a command for an active session without exposing its capability."""
+
+        for session in self._sessions.values():
+            if session.session_id == session_id:
+                self.queue(session.capability, subject, payload)
+                return
+        raise ValueError("Conjure session is expired or invalid")
 
     def drain(self, capability: str) -> tuple[BridgeSession, list[dict[str, Any]]]:
         session = self._get(capability)
