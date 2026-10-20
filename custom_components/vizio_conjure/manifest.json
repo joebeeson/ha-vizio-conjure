@@ -2,10 +2,10 @@
   "domain": "vizio_conjure",
   "name": "VIZIO Conjure",
   "codeowners": ["@joebeeson"],
-  "config_flow": false,
+  "config_flow": true,
   "documentation": "https://github.com/joebeeson/ha-vizio-conjure",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/joebeeson/ha-vizio-conjure/issues",
-  "requirements": [],
+  "requirements": ["vizaio>=0.7,<0.8"],
   "version": "0.1.0"
 }

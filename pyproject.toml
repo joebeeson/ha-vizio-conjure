@@ -13,11 +13,13 @@ authors = [{ name = "Joe Beeson" }]
 
 [project.optional-dependencies]
 dev = [
+  "homeassistant==2026.10.2; python_full_version >= '3.14.2'",
   "pyrefly>=1.4,<2",
   "pytest>=8,<9",
   "pytest-cov>=6,<8",
   "pytest-datadir>=1,<2",
   "ruff>=0.8,<1",
+  "vizaio>=0.7,<0.8",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -37,4 +39,5 @@ select = ["E4", "E7", "E9", "F", "I"]
 project-excludes = []
 disable-project-excludes-heuristics = true
 search-path = ["custom_components"]
+replace-imports-with-any = ["vizaio_conjure"]
 project-includes = ["custom_components/**/*.py", "tests/**/*.py"]

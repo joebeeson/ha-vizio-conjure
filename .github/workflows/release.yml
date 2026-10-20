@@ -25,6 +25,7 @@ jobs:
           --with homeassistant==2026.10.2
           --with pytest
           --with pytest-cov
+          --with "vizaio>=0.7,<0.8"
           pytest tests
       - run: uv run --extra dev ruff check custom_components tests
       - run: uv run --extra dev ruff format --check custom_components tests

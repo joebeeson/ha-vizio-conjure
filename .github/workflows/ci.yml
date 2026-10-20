@@ -33,6 +33,7 @@ jobs:
           --with pytest
           --with pytest-cov
           --with pytest-datadir
+          --with "vizaio>=0.7,<0.8"
           pytest tests
           --junitxml=artifacts/junit.xml
           --cov=custom_components.vizio_conjure

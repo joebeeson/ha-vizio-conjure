@@ -1,0 +1,17 @@
+launch:
+  name: Launch Conjure page
+  description: Launch a LAN-reachable HTTP or HTTPS page on a paired VIZIO TV.
+  fields:
+    url:
+      name: URL
+      description: The page URL the TV can reach.
+      required: true
+      example: http://home-assistant.local:8765/
+      selector:
+        text:
+    entry_id:
+      name: Config entry ID
+      description: Required when more than one VIZIO Conjure device is configured.
+      required: false
+      selector:
+        text:

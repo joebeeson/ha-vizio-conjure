@@ -1,0 +1,30 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect a VIZIO TV",
+        "description": "Enter the TV host and choose a name. Home Assistant will ask the TV to display a pairing PIN.",
+        "data": {
+          "host": "TV host and port",
+          "profile_name": "Name",
+          "device_name": "Pairing identity"
+        }
+      },
+      "pin": {
+        "title": "Enter the VIZIO pairing PIN",
+        "description": "Read the PIN shown on the TV and enter it here. The PIN is used once and is not stored.",
+        "data": {
+          "pin": "TV PIN"
+        }
+      }
+    },
+    "error": {
+      "invalid_host": "Enter a host and port without spaces.",
+      "cannot_connect": "Could not start pairing with the TV.",
+      "invalid_pin": "The TV rejected that PIN. Check the TV and try again."
+    },
+    "abort": {
+      "already_configured": "This TV is already configured."
+    }
+  }
+}
