@@ -6,7 +6,8 @@ install:
     uv sync --extra dev
 
 test:
-    uv run --extra dev pytest --junitxml=artifacts/junit.xml
+    uv run --extra dev python -c "from pathlib import Path; Path('artifacts').mkdir(exist_ok=True)"
+    uv run --extra dev pytest --junitxml=artifacts/junit.xml --cov=custom_components.vizio_conjure --cov-report=term-missing --cov-report=xml:artifacts/coverage.xml
 
 lint:
     uv run --extra dev ruff check .
