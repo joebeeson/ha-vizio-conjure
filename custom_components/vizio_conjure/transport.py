@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlencode, urlsplit, urlunsplit
 from uuid import uuid4
 
 from vizaio import AppConfig, DeviceType, Vizio, VizioError
@@ -56,12 +56,24 @@ class ConjureSnapshot:
     last_error: str | None = None
 
 
-def _with_bridge_fragment(url: str, *, capability: str, endpoint: str) -> str:
+def _with_bridge_fragment(
+    url: str,
+    *,
+    capability: str,
+    endpoint: str,
+    target: str | None = None,
+) -> str:
     """Attach bridge bootstrap data in the fragment, never the request URL."""
 
     parsed = urlsplit(url)
     fragment = parsed.fragment
-    bridge = f"conjure_capability={capability}&conjure_endpoint={endpoint}"
+    bridge = urlencode(
+        {
+            "conjure_capability": capability,
+            "conjure_endpoint": endpoint,
+            **({"conjure_target": target} if target is not None else {}),
+        }
+    )
     combined = f"{fragment}&{bridge}" if fragment else bridge
     return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, parsed.query, combined))
 
@@ -111,6 +123,7 @@ class ConjureConnection:
         target_name: str | None = None,
         bridge: Any = None,
         entry_id: str | None = None,
+        receiver_target: str | None = None,
     ) -> ConjureTarget:
         target = ConjureTarget(url)
         self._snapshot = ConjureSnapshot(
@@ -122,11 +135,16 @@ class ConjureConnection:
         session = None
         launch_url = target.url
         if bridge is not None:
-            session = bridge.issue(str(uuid4()), entry_id=entry_id)
+            session = bridge.issue(
+                str(uuid4()),
+                entry_id=entry_id,
+                receiver=receiver_target is not None,
+            )
             launch_url = _with_bridge_fragment(
                 target.url,
                 capability=session.capability,
                 endpoint=getattr(bridge, "endpoint", "/api/vizio_conjure/bridge"),
+                target=receiver_target,
             )
         launch_target = ConjureTarget(
             launch_url,

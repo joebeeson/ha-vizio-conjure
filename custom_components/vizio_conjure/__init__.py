@@ -21,6 +21,7 @@ from .const import (
     ATTR_TARGET_NAME,
     ATTR_URL,
     ATTR_VIEW_PATH,
+    BRIDGE_RECEIVER_PATH,
     CONF_AUTH_TOKEN,
     CONF_HOST,
     CONF_TARGETS,
@@ -34,7 +35,9 @@ from .const import (
     SERVICE_SHOW_LOVELACE_VIEW,
 )
 from .coordinator import ConjureCoordinator
-from .lovelace import build_signed_lovelace_url
+from .identity import async_remove_receiver_identity
+from .lovelace import lovelace_path
+from .receiver import ReceiverView
 from .targets import TargetRecord, find_target, parse_targets
 from .transport import ConjureConnection
 
@@ -148,6 +151,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     bridge = data.setdefault("bridge", BridgeRegistry(hass, endpoint=endpoint))
     if not data.get("bridge_view_registered"):
         hass.http.register_view(BridgeView(bridge))
+        hass.http.register_view(ReceiverView(hass, bridge))
         data["bridge_view_registered"] = True
 
     async def async_launch(call: ServiceCall) -> None:
@@ -168,16 +172,16 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
         entry_id, runtime = _runtime_for_call(hass, call)
         try:
             dashboard_path, view_path, target_name = _resolve_lovelace_view(hass, entry_id, call)
-            url = build_signed_lovelace_url(
-                hass,
-                dashboard_path=dashboard_path,
-                view_path=view_path,
-            )
+            base_url = hass.config.internal_url or hass.config.external_url
+            if not base_url:
+                raise HomeAssistantError("Home Assistant internal_url or external_url is required")
+            url = f"{base_url.rstrip('/')}{BRIDGE_RECEIVER_PATH}"
             await runtime.connection.async_launch_url(
                 url,
                 target_name=target_name,
                 bridge=bridge,
                 entry_id=entry_id,
+                receiver_target=lovelace_path(dashboard_path, view_path),
             )
             await runtime.coordinator.async_request_refresh()
         except (OSError, ValueError, VizioError) as err:
@@ -276,3 +280,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unloaded:
         hass.data[DOMAIN]["entries"].pop(entry.entry_id, None)
     return unloaded
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Remove the dedicated receiver identity with the config entry."""
+
+    await async_remove_receiver_identity(hass, entry)

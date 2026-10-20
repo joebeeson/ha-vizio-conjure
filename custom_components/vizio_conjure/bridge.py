@@ -13,7 +13,12 @@ from aiohttp import web
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.core import HomeAssistant
 
-from .const import BRIDGE_EVENT, BRIDGE_PATH, COMMAND_SUBJECTS, PAGE_SUBJECTS
+from .const import (
+    BRIDGE_EVENT,
+    BRIDGE_PATH,
+    COMMAND_SUBJECTS,
+    PAGE_SUBJECTS,
+)
 
 
 @dataclass(slots=True)
@@ -24,6 +29,7 @@ class BridgeSession:
     capability: str
     expires_at: float
     entry_id: str | None = None
+    receiver: bool = False
     commands: deque[dict[str, Any]] = field(default_factory=deque)
 
     def expired(self) -> bool:
@@ -45,13 +51,20 @@ class BridgeRegistry:
         self.endpoint = endpoint or BRIDGE_PATH
         self._sessions: dict[str, BridgeSession] = {}
 
-    def issue(self, session_id: str, *, entry_id: str | None = None) -> BridgeSession:
+    def issue(
+        self,
+        session_id: str,
+        *,
+        entry_id: str | None = None,
+        receiver: bool = False,
+    ) -> BridgeSession:
         capability = secrets.token_urlsafe(32)
         session = BridgeSession(
             session_id=session_id,
             capability=capability,
             expires_at=time.time() + self.ttl_seconds,
             entry_id=entry_id,
+            receiver=receiver,
         )
         self._sessions[capability] = session
         return session
@@ -114,6 +127,14 @@ class BridgeRegistry:
         commands = list(session.commands)
         session.commands.clear()
         return session, commands
+
+    def receiver_session(self, capability: str) -> BridgeSession:
+        """Validate a capability issued specifically for the receiver page."""
+
+        session = self._get(capability)
+        if session is None or not session.receiver:
+            raise ValueError("receiver capability is expired or invalid")
+        return session
 
 
 class BridgeView(HomeAssistantView):

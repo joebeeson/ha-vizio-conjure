@@ -23,11 +23,13 @@ ATTR_VIEW_PATH = "view_path"
 ATTR_KEY = "key"
 
 CONF_TARGETS = "targets"
+CONF_RECEIVER_USER_ID = "receiver_user_id"
 
 PLATFORMS = ("sensor",)
 
 BRIDGE_EVENT = "vizio_conjure_page_event"
 BRIDGE_PATH = "/api/vizio_conjure/bridge"
+BRIDGE_RECEIVER_PATH = "/api/vizio_conjure/receiver"
 BRIDGE_TTL_SECONDS = 300
 
 ALLOWED_KEYS = frozenset(
