@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
@@ -27,6 +27,7 @@ class ConjureSessionSensor(CoordinatorEntity[ConjureCoordinator], SensorEntity):
     """Expose the current Conjure lifecycle and sanitized metadata."""
 
     _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_device_class = SensorDeviceClass.ENUM  # pyrefly: ignore [bad-override-mutable-attribute]
     _attr_icon = "mdi:television-play"
     _attr_native_unit_of_measurement = None
     _attr_options = ["idle", "launching", "active", "stopped", "unavailable", "error"]
