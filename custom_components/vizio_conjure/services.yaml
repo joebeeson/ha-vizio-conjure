@@ -59,9 +59,9 @@ show_lovelace_view:
       selector:
         select:
           options:
-            - outline
-            - glow
-            - off
+            - "outline"
+            - "glow"
+            - "off"
 
 reload:
   name: Reload Conjure page
