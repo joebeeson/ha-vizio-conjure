@@ -62,6 +62,7 @@ def _with_bridge_fragment(
     capability: str,
     endpoint: str,
     target: str | None = None,
+    focus_style: str | None = None,
 ) -> str:
     """Attach bridge bootstrap data in the fragment, never the request URL."""
 
@@ -72,6 +73,7 @@ def _with_bridge_fragment(
             "conjure_capability": capability,
             "conjure_endpoint": endpoint,
             **({"conjure_target": target} if target is not None else {}),
+            **({"conjure_focus_style": focus_style} if focus_style is not None else {}),
         }
     )
     combined = f"{fragment}&{bridge}" if fragment else bridge
@@ -98,6 +100,8 @@ class ConjureConnection:
         self._auth_token = auth_token
         self._snapshot = ConjureSnapshot()
         self._last_target: ConjureTarget | None = None
+        self._last_receiver_target: str | None = None
+        self._last_receiver_focus_style: str | None = None
 
     @property
     def snapshot(self) -> ConjureSnapshot:
@@ -124,6 +128,7 @@ class ConjureConnection:
         bridge: Any = None,
         entry_id: str | None = None,
         receiver_target: str | None = None,
+        receiver_focus_style: str | None = None,
     ) -> ConjureTarget:
         target = ConjureTarget(url)
         self._snapshot = ConjureSnapshot(
@@ -145,6 +150,7 @@ class ConjureConnection:
                 capability=session.capability,
                 endpoint=getattr(bridge, "endpoint", "/api/vizio_conjure/bridge"),
                 target=receiver_target,
+                focus_style=receiver_focus_style,
             )
         launch_target = ConjureTarget(
             launch_url,
@@ -178,6 +184,8 @@ class ConjureConnection:
             )
             raise
         self._last_target = target
+        self._last_receiver_target = receiver_target
+        self._last_receiver_focus_style = receiver_focus_style
         self._snapshot = ConjureSnapshot(
             state="active",
             session_id=session.session_id if session else None,
@@ -218,6 +226,8 @@ class ConjureConnection:
             target_name=self._snapshot.target_name,
             bridge=bridge,
             entry_id=entry_id,
+            receiver_target=self._last_receiver_target,
+            receiver_focus_style=self._last_receiver_focus_style,
         )
 
     async def async_refresh(self) -> ConjureSnapshot:

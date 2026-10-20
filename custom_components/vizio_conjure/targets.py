@@ -7,6 +7,8 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from urllib.parse import urlsplit
 
+from .const import FOCUS_STYLES
+
 
 @dataclass(frozen=True, slots=True)
 class TargetRecord:
@@ -17,6 +19,7 @@ class TargetRecord:
     url: str | None = None
     dashboard_path: str | None = None
     view_path: str | None = None
+    focus_style: str | None = None
 
     def __post_init__(self) -> None:
         name = self.name.strip()
@@ -27,6 +30,11 @@ class TargetRecord:
             raise ValueError("target kind must be url or lovelace")
         object.__setattr__(self, "name", name)
         object.__setattr__(self, "kind", kind)
+        if self.focus_style is not None:
+            focus_style = self.focus_style.strip().lower()
+            if focus_style not in FOCUS_STYLES:
+                raise ValueError("focus_style must be off, outline, or glow")
+            object.__setattr__(self, "focus_style", focus_style)
         if kind == "url":
             if not self.url:
                 raise ValueError("URL targets require url")
@@ -70,6 +78,9 @@ def parse_targets(value: object) -> tuple[TargetRecord, ...]:
                 item.get("dashboard_path") if isinstance(item.get("dashboard_path"), str) else None
             ),
             view_path=(item.get("view_path") if isinstance(item.get("view_path"), str) else None),
+            focus_style=(
+                item.get("focus_style") if isinstance(item.get("focus_style"), str) else None
+            ),
         )
         key = record.name.casefold()
         if key in names:
@@ -92,6 +103,7 @@ def targets_json(targets: tuple[TargetRecord, ...]) -> str:
                     "url": target.url,
                     "dashboard_path": target.dashboard_path,
                     "view_path": target.view_path,
+                    "focus_style": target.focus_style,
                 }.items()
                 if value is not None
             }

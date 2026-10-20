@@ -21,6 +21,7 @@ ATTR_TARGET_NAME = "target_name"
 ATTR_DASHBOARD_PATH = "dashboard_path"
 ATTR_VIEW_PATH = "view_path"
 ATTR_KEY = "key"
+ATTR_FOCUS_STYLE = "focus_style"
 
 CONF_TARGETS = "targets"
 CONF_RECEIVER_USER_ID = "receiver_user_id"
@@ -50,5 +51,6 @@ ALLOWED_KEYS = frozenset(
 
 PAGE_SUBJECTS = frozenset({"page.ready", "page.error", "page.focus", "page.interaction"})
 COMMAND_SUBJECTS = frozenset({"page.navigate", "page.reload", "page.focus", "session.close"})
+FOCUS_STYLES = frozenset({"off", "outline", "glow"})
 
 DEFAULT_DEVICE_NAME = "ha-vizio-conjure"

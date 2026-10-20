@@ -16,6 +16,7 @@ from .const import (
     ALLOWED_KEYS,
     ATTR_DASHBOARD_PATH,
     ATTR_ENTRY_ID,
+    ATTR_FOCUS_STYLE,
     ATTR_KEY,
     ATTR_TARGET,
     ATTR_TARGET_NAME,
@@ -26,6 +27,7 @@ from .const import (
     CONF_HOST,
     CONF_TARGETS,
     DOMAIN,
+    FOCUS_STYLES,
     PLATFORMS,
     SERVICE_EXIT,
     SERVICE_LAUNCH,
@@ -55,6 +57,7 @@ SHOW_LOVELACE_SCHEMA = vol.Schema(
         vol.Optional(ATTR_DASHBOARD_PATH, default="lovelace"): cv.string,
         vol.Optional(ATTR_TARGET_NAME): cv.string,
         vol.Optional(ATTR_ENTRY_ID): cv.string,
+        vol.Optional(ATTR_FOCUS_STYLE): vol.In(sorted(FOCUS_STYLES)),
     }
 )
 RELOAD_SCHEMA = vol.Schema({vol.Optional(ATTR_ENTRY_ID): cv.string})
@@ -125,7 +128,7 @@ def _resolve_url(hass: HomeAssistant, entry_id: str, call: ServiceCall) -> tuple
 
 def _resolve_lovelace_view(
     hass: HomeAssistant, entry_id: str, call: ServiceCall
-) -> tuple[str, str, str | None]:
+) -> tuple[str, str, str | None, str]:
     target_name = call.data.get(ATTR_TARGET_NAME)
     if target_name:
         try:
@@ -134,11 +137,21 @@ def _resolve_lovelace_view(
             raise HomeAssistantError(str(err)) from err
         if target.kind != "lovelace":
             raise HomeAssistantError("The selected target is not a Lovelace target")
-        return target.dashboard_path or "lovelace", target.view_path or "", target.name
+        return (
+            target.dashboard_path or "lovelace",
+            target.view_path or "",
+            target.name,
+            call.data.get(ATTR_FOCUS_STYLE) or target.focus_style or "outline",
+        )
     view_path = call.data.get(ATTR_VIEW_PATH)
     if not view_path:
         raise HomeAssistantError("Specify view_path or a named Lovelace target")
-    return call.data.get(ATTR_DASHBOARD_PATH, "lovelace"), view_path, None
+    return (
+        call.data.get(ATTR_DASHBOARD_PATH, "lovelace"),
+        view_path,
+        None,
+        call.data.get(ATTR_FOCUS_STYLE, "outline"),
+    )
 
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
@@ -171,7 +184,9 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     async def async_show_lovelace(call: ServiceCall) -> None:
         entry_id, runtime = _runtime_for_call(hass, call)
         try:
-            dashboard_path, view_path, target_name = _resolve_lovelace_view(hass, entry_id, call)
+            dashboard_path, view_path, target_name, focus_style = _resolve_lovelace_view(
+                hass, entry_id, call
+            )
             base_url = hass.config.internal_url or hass.config.external_url
             if not base_url:
                 raise HomeAssistantError("Home Assistant internal_url or external_url is required")
@@ -182,6 +197,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
                 bridge=bridge,
                 entry_id=entry_id,
                 receiver_target=lovelace_path(dashboard_path, view_path),
+                receiver_focus_style=focus_style,
             )
             await runtime.coordinator.async_request_refresh()
         except (OSError, ValueError, VizioError) as err:

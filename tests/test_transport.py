@@ -32,6 +32,20 @@ def test_sanitize_message_removes_url_credentials() -> None:
     assert message == "https://ha.local/lovelace/home"
 
 
+def test_bridge_fragment_keeps_capability_and_focus_style_in_fragment() -> None:
+    launch = transport._with_bridge_fragment(
+        "http://ha.local/api/vizio_conjure/receiver",
+        capability="capability",
+        endpoint="/api/vizio_conjure/bridge",
+        target="/lovelace/home",
+        focus_style="glow",
+    )
+
+    assert launch.startswith("http://ha.local/api/vizio_conjure/receiver#")
+    assert "conjure_focus_style=glow" in launch
+    assert "capability" in launch
+
+
 def test_connection_maps_launch_to_upstream_app_config(monkeypatch) -> None:
     calls: list[AppConfig] = []
 

@@ -51,6 +51,17 @@ show_lovelace_view:
       required: false
       selector:
         text:
+    focus_style:
+      name: Focus style
+      description: How the receiver identifies the focused Lovelace control. Use off to retain ordinary browser scrolling.
+      required: false
+      default: outline
+      selector:
+        select:
+          options:
+            - outline
+            - glow
+            - off
 
 reload:
   name: Reload Conjure page
