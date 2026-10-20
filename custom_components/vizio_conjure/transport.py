@@ -66,6 +66,18 @@ def _with_bridge_fragment(url: str, *, capability: str, endpoint: str) -> str:
     return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, parsed.query, combined))
 
 
+def _sanitize_message(message: object) -> str | None:
+    """Keep app metadata useful without retaining URL credentials or tokens."""
+
+    if message is None:
+        return None
+    value = str(message)
+    parsed = urlsplit(value)
+    if parsed.scheme.lower() in {"http", "https"} and parsed.netloc:
+        return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, "", ""))
+    return value[:256]
+
+
 class ConjureConnection:
     """Open a short-lived authenticated vizaio session for each launch."""
 
@@ -221,7 +233,7 @@ class ConjureConnection:
                     url=self._snapshot.url,
                     current_app_id=getattr(current_app, "app_id", None),
                     current_namespace=getattr(current_app, "name_space", None),
-                    current_message=getattr(current_app, "message", None),
+                    current_message=_sanitize_message(getattr(current_app, "message", None)),
                     runtime=self._snapshot.runtime,
                     model=model,
                     firmware=firmware,

@@ -24,6 +24,14 @@ def test_target_rejects_unsafe_urls(url: str) -> None:
         ConjureTarget(url)
 
 
+def test_sanitize_message_removes_url_credentials() -> None:
+    message = transport._sanitize_message(
+        "https://ha.local/lovelace/home?authSig=secret#capability=secret"
+    )
+
+    assert message == "https://ha.local/lovelace/home"
+
+
 def test_connection_maps_launch_to_upstream_app_config(monkeypatch) -> None:
     calls: list[AppConfig] = []
 
