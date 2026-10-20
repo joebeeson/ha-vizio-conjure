@@ -1,17 +1,100 @@
 launch:
   name: Launch Conjure page
-  description: Launch a LAN-reachable HTTP or HTTPS page on a paired VIZIO TV.
+  description: Launch a named or LAN-reachable HTTP or HTTPS page on a paired VIZIO TV.
   fields:
     url:
       name: URL
-      description: The page URL the TV can reach.
-      required: true
+      description: The page URL the TV can reach. Use this or target.
+      required: false
       example: http://home-assistant.local:8765/
+      selector:
+        text:
+    target:
+      name: Named target
+      description: A target configured in the VIZIO Conjure options.
+      required: false
       selector:
         text:
     entry_id:
       name: Config entry ID
       description: Required when more than one VIZIO Conjure device is configured.
+      required: false
+      selector:
+        text:
+
+show_lovelace_view:
+  name: Show Lovelace view
+  description: Launch a signed Home Assistant dashboard view on the VIZIO TV.
+  fields:
+    dashboard_path:
+      name: Dashboard path
+      description: Dashboard URL path, such as lovelace or lovelace-cast.
+      required: false
+      default: lovelace
+      selector:
+        text:
+    view_path:
+      name: View path
+      description: View path configured in the dashboard; optional for a named Lovelace target.
+      required: false
+      selector:
+        text:
+    target_name:
+      name: Target name
+      description: Optional name shown in the session sensor.
+      required: false
+      selector:
+        text:
+    entry_id:
+      name: Config entry ID
+      description: Required when more than one VIZIO Conjure device is configured.
+      required: false
+      selector:
+        text:
+
+reload:
+  name: Reload Conjure page
+  description: Relaunch the currently active Conjure target.
+  fields:
+    entry_id:
+      name: Config entry ID
+      required: false
+      selector:
+        text:
+
+exit:
+  name: Exit Conjure page
+  description: Return the TV to SmartCast Home.
+  fields:
+    entry_id:
+      name: Config entry ID
+      required: false
+      selector:
+        text:
+
+send_key:
+  name: Send Conjure key
+  description: Send an allowlisted remote key to the paired TV.
+  fields:
+    key:
+      name: Key
+      required: true
+      selector:
+        select:
+          options:
+            - UP
+            - DOWN
+            - LEFT
+            - RIGHT
+            - OK
+            - BACK
+            - EXIT
+            - HOME
+            - MENU
+            - PLAY
+            - PAUSE
+    entry_id:
+      name: Config entry ID
       required: false
       selector:
         text:

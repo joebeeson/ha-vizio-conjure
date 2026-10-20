@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import uuid
 
 import voluptuous as vol
@@ -13,15 +14,24 @@ from .const import (
     CONF_DEVICE_NAME,
     CONF_HOST,
     CONF_PROFILE_NAME,
+    CONF_TARGETS,
     DEFAULT_DEVICE_NAME,
     DOMAIN,
 )
+from .targets import parse_targets, targets_json
 
 
 class VizioConjureConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Pair a VIZIO TV and retain its token in a Home Assistant config entry."""
 
     VERSION = 1
+
+    @staticmethod
+    @config_entries.callback
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry):
+        """Return the named-target options flow."""
+
+        return VizioConjureOptionsFlow()
 
     def __init__(self) -> None:
         self._vizio: Vizio | None = None
@@ -110,3 +120,34 @@ class VizioConjureConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         finally:
             if vizio is not None:
                 await vizio.aclose()
+
+
+class VizioConjureOptionsFlow(config_entries.OptionsFlow):
+    """Edit named URL and Lovelace targets without storing secrets."""
+
+    async def async_step_init(self, user_input=None) -> ConfigFlowResult:
+        errors: dict[str, str] = {}
+        entry = self.config_entry
+        existing = entry.options.get(CONF_TARGETS, [])
+        if user_input is not None:
+            try:
+                targets = parse_targets(user_input[CONF_TARGETS])
+            except ValueError:
+                errors["base"] = "invalid_targets"
+            else:
+                return self.async_create_entry(
+                    title="",
+                    data={CONF_TARGETS: json.loads(targets_json(targets))},
+                )
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(  # pyrefly: ignore [bad-argument-type]
+                {
+                    vol.Required(
+                        CONF_TARGETS,
+                        default=targets_json(parse_targets(existing)),
+                    ): str
+                }
+            ),
+            errors=errors,
+        )

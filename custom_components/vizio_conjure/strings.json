@@ -21,10 +21,22 @@
     "error": {
       "invalid_host": "Enter a host and port without spaces.",
       "cannot_connect": "Could not start pairing with the TV.",
-      "invalid_pin": "The TV rejected that PIN. Check the TV and try again."
+      "invalid_pin": "The TV rejected that PIN. Check the TV and try again.",
+      "invalid_targets": "Enter a valid JSON list of unique URL or Lovelace targets."
     },
     "abort": {
       "already_configured": "This TV is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "VIZIO Conjure targets",
+        "description": "Enter a JSON list of named URL or Lovelace targets. Targets contain no credentials.",
+        "data": {
+          "targets": "Targets JSON"
+        }
+      }
     }
   }
 }

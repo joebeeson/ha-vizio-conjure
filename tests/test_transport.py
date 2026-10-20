@@ -56,3 +56,69 @@ def test_connection_maps_launch_to_upstream_app_config(monkeypatch) -> None:
     assert calls[0].app_id == "17"
     assert calls[0].name_space == 4
     assert calls[0].message == "http://server.local:8765/"
+
+
+def test_connection_sends_only_allowlisted_keys(monkeypatch) -> None:
+    keys: list[str] = []
+
+    class FakeDevice:
+        async def send_key(self, key: str) -> None:
+            keys.append(key)
+
+    class FakeVizio:
+        def __init__(self, **kwargs: object) -> None:
+            pass
+
+        async def __aenter__(self) -> FakeDevice:
+            return FakeDevice()
+
+        async def __aexit__(self, *exc: object) -> None:
+            return None
+
+    monkeypatch.setattr(transport, "Vizio", FakeVizio)
+    connection = transport.ConjureConnection(host="tv.local:7345", auth_token="AUTH:test")
+    asyncio.run(connection.async_send_key("right"))
+    assert keys == ["RIGHT"]
+
+    with pytest.raises(ValueError):
+        asyncio.run(connection.async_send_key("DROP_DATABASE"))
+
+
+def test_connection_refreshes_current_app_and_marks_home_stopped(monkeypatch) -> None:
+    class FakeApp:
+        app_id = "1"
+        name_space = 4
+        message = '{"app":"home"}'
+
+    class FakeState:
+        current_app = FakeApp()
+        device_name = "Living Room TV"
+
+    class FakeDevice:
+        async def launch_app_config(self, config: AppConfig) -> None:
+            return None
+
+        async def get_state_extended(self) -> FakeState:
+            return FakeState()
+
+        async def get_firmware_version(self) -> str:
+            return "1.2.3"
+
+    class FakeVizio:
+        def __init__(self, **kwargs: object) -> None:
+            pass
+
+        async def __aenter__(self) -> FakeDevice:
+            return FakeDevice()
+
+        async def __aexit__(self, *exc: object) -> None:
+            return None
+
+    monkeypatch.setattr(transport, "Vizio", FakeVizio)
+    connection = transport.ConjureConnection(host="tv.local:7345", auth_token="AUTH:test")
+    asyncio.run(connection.async_launch_url("http://server.local:8765/"))
+    snapshot = asyncio.run(connection.async_refresh())
+    assert snapshot.state == "stopped"
+    assert snapshot.current_app_id == "1"
+    assert snapshot.model == "Living Room TV"
+    assert snapshot.firmware == "1.2.3"

@@ -9,17 +9,20 @@ Private Home Assistant integration project for VIZIO Conjure.
 
 ## Current status
 
-The first integration slice now pairs a TV through Home Assistant and exposes
-the `vizio_conjure.launch` action for a LAN-reachable HTTP or HTTPS page. It is
-still intentionally small: no Lovelace mirroring, page bridge, entities, or
-HACS catalog submission yet.
+Milestone 2 now pairs a TV through Home Assistant, stores named targets, exposes
+Conjure session state, and provides launch, Lovelace-view, reload, exit, and
+allowlisted remote-key actions. A page receives a short-lived bridge capability
+in the URL fragment; no long-lived Home Assistant token is sent to a generic
+page.
 
 ## Planned boundary
 
 Home Assistant launches and presents developer-hosted Conjure pages through the
 Python library. TV pages must never receive a long-lived Home Assistant access
-token. The integration will use short-lived URLs or a narrow bridge protocol
-instead.
+or refresh token. The integration uses a short-lived signed dashboard path and
+a narrow capability bridge instead. The signed Lovelace path remains a physical
+TV acceptance gate because the page must also establish its live Home Assistant
+WebSocket connection.
 
 Do not commit pairing tokens, private URLs, household data, or captured TV
 responses.
@@ -42,6 +45,43 @@ The page must be reachable from the TV. The current implementation uses the
 same app 17 / namespace 4 launch mapping as `vizaio-conjure`; it uses a small
 compatibility path until the private Python library is publishable as a
 runtime dependency.
+
+## Named targets
+
+Open the VIZIO Conjure config-entry options and enter a JSON list such as:
+
+```json
+[
+  {"name": "Smoke", "kind": "url", "url": "http://192.168.20.107:8765/"},
+  {
+    "name": "Downstairs",
+    "kind": "lovelace",
+    "dashboard_path": "lovelace-cast",
+    "view_path": "downstairs"
+  }
+]
+```
+
+Launch a named URL with:
+
+```yaml
+action: vizio_conjure.launch
+data:
+  target: Smoke
+```
+
+Launch a dashboard view with:
+
+```yaml
+action: vizio_conjure.show_lovelace_view
+data:
+  dashboard_path: lovelace-cast
+  view_path: downstairs
+```
+
+The web SDK normalizes the measured VIZIO DOM key events and can install an
+opt-in focus adapter. Pages should expose ordinary focusable controls; the SDK
+does not draw a separate cursor or execute arbitrary Home Assistant services.
 
 ## Development
 
