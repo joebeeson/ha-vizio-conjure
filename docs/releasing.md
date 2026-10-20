@@ -11,5 +11,5 @@ component archive; they do not install or publish an integration automatically.
 4. The release workflow tests the scaffold, validates quality, packages the
    component, and attaches the zip to a GitHub release.
 
-HACS catalog submission and the config flow, services, entities, and runtime
-integration remain Milestone 2 work.
+HACS catalog submission and validation, along with the config flow, services,
+entities, and runtime integration, remain Milestone 2 work.
