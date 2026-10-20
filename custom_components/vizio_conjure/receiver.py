@@ -105,6 +105,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111;color:
     setFocus(candidates[0]?.element);
   };
   const handleKey = (event) => {
+    if (event.type !== "keydown") return;
     if (focusStyle === "off") return;
     const key = {ArrowUp:"UP",ArrowDown:"DOWN",ArrowLeft:"LEFT",ArrowRight:"RIGHT",Enter:"OK",Space:"OK",Escape:"BACK",BrowserBack:"BACK"}[event.key];
     if (!key) return;

@@ -6,3 +6,4 @@ def test_receiver_supports_configurable_focus_styles_and_activation() -> None:
     assert "vizio-conjure-focused" in RECEIVER_HTML
     assert "page.interaction" in RECEIVER_HTML
     assert "current.click()" in RECEIVER_HTML
+    assert 'if (event.type !== "keydown") return;' in RECEIVER_HTML
