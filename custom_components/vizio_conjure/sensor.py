@@ -44,15 +44,19 @@ class ConjureSessionSensor(CoordinatorEntity[ConjureCoordinator], SensorEntity):
 
     @property
     def native_value(self) -> str:
-        return self.coordinator.data.state
+        snapshot = self.coordinator.data
+        return snapshot.state if snapshot is not None else "unavailable"
 
     @property
     def available(self) -> bool:
-        return self.coordinator.data.state != "unavailable"
+        snapshot = self.coordinator.data
+        return snapshot is not None and snapshot.state != "unavailable"
 
     @property
     def extra_state_attributes(self) -> dict[str, object]:
         snapshot = self.coordinator.data
+        if snapshot is None:
+            return {}
         return {
             key: value
             for key, value in {
