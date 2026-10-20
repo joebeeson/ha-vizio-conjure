@@ -15,7 +15,7 @@ authors = [{ name = "Joe Beeson" }]
 dev = [
   "homeassistant==2026.10.2; python_full_version >= '3.14.2'",
   "pyrefly>=1.4,<2",
-  "pytest>=8,<9",
+  "pytest>=8,<10",
   "pytest-cov>=6,<8",
   "pytest-datadir>=1,<2",
   "ruff>=0.8,<1",
