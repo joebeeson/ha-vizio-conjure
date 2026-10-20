@@ -48,6 +48,18 @@ Record only sanitized results:
 - [ ] The current app and return behavior were checked without recording
       pairing tokens or full TV responses.
 
+### Completed run: 2026-10-20
+
+- [x] The config flow paired the TV and created one VIZIO Conjure device.
+- [x] Home Assistant launched the smoke page through `vizio_conjure.launch`.
+- [x] The physical TV rendered the `CONJURE OK` marker.
+- [x] The page reported the VIZIO SmartCast Conjure runtime, firmware, and
+      `M65Q6-L4` model metadata.
+- [x] The page received four remote events (left/right keydown and keyup).
+- [x] The supported `EXIT` remote command returned the TV to its normal home
+      app before the successful retry.
+- [x] No pairing PIN, auth token, or full TV response was recorded.
+
 If the launch fails, first verify that the TV can route to the page host and
 that the URL uses the host's LAN address. The integration deliberately does
 not send Home Assistant credentials to the page.
