@@ -47,7 +47,7 @@ jobs:
           path: artifacts/
       - name: Publish test results
         if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-        uses: dorny/test-reporter@d3cb5605561a46347256b466ef836b85076ad522 # v2.5.0
+        uses: dorny/test-reporter@b082adf0eced0765477756c2a610396589b8c637 # v2.5.0
         with:
           name: pytest (Home Assistant)
           path: artifacts/junit.xml
@@ -76,7 +76,7 @@ jobs:
           path: artifacts/pyrefly.xml
       - name: Publish type-check results
         if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-        uses: dorny/test-reporter@d3cb5605561a46347256b466ef836b85076ad522 # v2.5.0
+        uses: dorny/test-reporter@b082adf0eced0765477756c2a610396589b8c637 # v2.5.0
         with:
           name: pyrefly
           path: artifacts/pyrefly.xml
