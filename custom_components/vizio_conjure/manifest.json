@@ -6,6 +6,6 @@
   "documentation": "https://github.com/joebeeson/ha-vizio-conjure",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/joebeeson/ha-vizio-conjure/issues",
-  "requirements": ["vizaio>=0.7,<0.8"],
+  "requirements": ["vizaio>=0.7,<0.8", "vizaio-conjure>=0.1.0,<0.2"],
   "version": "0.2.0"
 }

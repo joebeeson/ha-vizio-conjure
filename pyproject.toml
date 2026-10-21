@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ha-vizio-conjure"
-version = "0.1.0"
+version = "0.2.0"
 description = "Home Assistant integration scaffold for VIZIO Conjure"
 readme = "README.md"
 license = { text = "MIT" }

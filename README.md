@@ -5,7 +5,7 @@
 [![Latest release](https://img.shields.io/github/v/release/joebeeson/ha-vizio-conjure?include_prereleases)](https://github.com/joebeeson/ha-vizio-conjure/releases)
 [![License](https://img.shields.io/github/license/joebeeson/ha-vizio-conjure)](LICENSE)
 
-Private Home Assistant integration project for VIZIO Conjure.
+Home Assistant integration for VIZIO Conjure.
 
 ## Current status
 
@@ -91,9 +91,17 @@ does not draw a separate cursor or execute arbitrary Home Assistant services.
 
 Run `just check` from the repository root. CI exercises the scaffold against
 Home Assistant's current Python runtime with pytest-cov and pytest-datadir,
-then runs Ruff and Pyrefly checks. HACS and Hassfest validation are deferred
-until the repository is ready for public catalog review.
+then runs Ruff and Pyrefly checks. Public releases also run HACS and Hassfest
+validation.
 
-Tagged releases package the component directory, manifest, README, and license
-as a private GitHub release artifact. Page bridging, entities, HACS catalog
-submission, and installation guidance remain deferred until later milestones.
+## Installation
+
+Until the integration is accepted into the HACS default catalog, add
+`joebeeson/ha-vizio-conjure` as a custom repository in HACS with category
+**Integration**. Install the `VIZIO Conjure` release, restart Home Assistant,
+and add it from Settings → Devices & services. Upgrades preserve the config
+entry and its stored pairing token.
+
+Tagged releases attach the deterministic `vizio_conjure.zip` artifact. The
+integration is designed for a TV-reachable Home Assistant URL and keeps
+credentials out of page URLs, events, logs, and sensor attributes.

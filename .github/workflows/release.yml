@@ -20,6 +20,13 @@ jobs:
         with:
           python-version: "3.14.2"
       - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+      - name: Verify manifest version matches tag
+        env:
+          TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          version="$(python -c 'import json; print(json.load(open("custom_components/vizio_conjure/manifest.json"))["version"])')"
+          test "$version" = "${TAG#v}"
       - run: >-
           uv run --no-project
           --with homeassistant==2026.10.2
@@ -35,7 +42,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          zip -r "dist/ha-vizio-conjure-${TAG}.zip" custom_components/vizio_conjure hacs.json README.md LICENSE
+          zip -r "dist/vizio_conjure.zip" custom_components/vizio_conjure hacs.json README.md LICENSE
       - name: Create or update GitHub release
         env:
           GH_TOKEN: ${{ github.token }}

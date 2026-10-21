@@ -6,13 +6,13 @@ from pathlib import Path
 from custom_components.vizio_conjure import async_setup
 
 
-def test_manifest_declares_private_integration_domain() -> None:
+def test_manifest_declares_public_integration_domain() -> None:
     manifest = json.loads(
         Path("custom_components/vizio_conjure/manifest.json").read_text(encoding="utf-8")
     )
     assert manifest["domain"] == "vizio_conjure"
     assert manifest["config_flow"] is True
-    assert manifest["requirements"] == ["vizaio>=0.7,<0.8"]
+    assert manifest["requirements"] == ["vizaio>=0.7,<0.8", "vizaio-conjure>=0.1.0,<0.2"]
 
 
 def test_integration_package_imports() -> None:
