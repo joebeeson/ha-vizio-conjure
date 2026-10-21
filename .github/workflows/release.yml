@@ -42,6 +42,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
+          find custom_components -type d -name __pycache__ -prune -exec rm -rf {} +
           zip -r "dist/vizio_conjure.zip" custom_components/vizio_conjure hacs.json README.md LICENSE
       - name: Create or update GitHub release
         env:
